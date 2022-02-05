@@ -36,14 +36,14 @@ namespace CognitiveSystems {
         }
 
         void learn(float error, float learningRate) {
-            static const auto sigm = [](float x) { return 1 / (1 + exp(-x)); };
+            static const auto sigm = [](float x) { return 1.f / (1.f + expf(-x)); };
             if (type == NeuronType::Input)
                 return;
 
             if (weights.size() != inputs.size())
                 throw std::runtime_error("width mismatch!");
 
-            delta = error * (sigm(output) / (1 - sigm(output)));
+            delta = error * (sigm(output) / (1.f - sigm(output)));
 
             for (int i = 0; i < weights.size(); ++i) {
                 auto weight = weights[i];
@@ -229,10 +229,10 @@ namespace CognitiveSystems {
             return previousLayerSignals;
         }
 
-        std::vector<float> backPropagation(const std::vector<float>& expected, const std::vector<float>& inputs, const float learningRate) noexcept {
-            std::vector<float> actuals = feedForward(inputs);
+        std::vector<float> backPropagation(const std::vector<float>& expected, const std::vector<float>& actuals, const float learningRate) noexcept {
+            //std::vector<float> actuals = feedForward(inputs);
             std::vector<float> diffs(expected.size(), 0.f);
-            
+            assert(actuals.size() == expected.size() && expected.size() == diffs.size());
             std::transform(actuals.begin(), actuals.end(), expected.begin(), diffs.begin(), [](const auto& t1, const auto& t2) { return t1 - t2; });
             auto& lastLayerNeurons = layers.back().getModifiableNeurons();
 
